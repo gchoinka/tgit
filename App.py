@@ -93,6 +93,8 @@ class App:
 
         self.args = args
 
+        self.gitBin = "git"
+        self.gitDefaultArgs = ['-c', 'core.abbrev=7']
         self.allTagsPerCommitHash = None
         self.filepath_commitsJson = None
         self.filepath_cacheJson = None
@@ -190,7 +192,7 @@ class App:
         newGroups = {}
         self.tagsUsedForCommits = set()
         # see https://git-scm.com/docs/pretty-formats
-        cmd = ['git', 'log', '-z', '--reverse', '--topo-order', '--format=%h%x09%p%x09%an%x09%ae%x09%aI%x09%B', Globals.branch]
+        cmd = [self.gitBin] + self.gitDefaultArgs + ['log', '-z', '--reverse', '--topo-order', '--format=%h%x09%p%x09%an%x09%ae%x09%aI%x09%B', Globals.branch]
         for log in Utils.call_nullSeperated( cmd, cwd=Globals.repositoryDir ):
             if log:
                 try:
@@ -240,7 +242,7 @@ class App:
         updateProgressDialogSignal.emit( 'Reading...', 2 )
 
         commit = None
-        cmd = ['git', 'log', '--cc', '--reverse', '--topo-order', '--format=%h', '--name-status', Globals.branch]
+        cmd = [self.gitBin] + self.gitDefaultArgs + ['log', '--cc', '--reverse', '--topo-order', '--format=%h', '--name-status', Globals.branch]
         for log in Utils.call( cmd, cwd=Globals.repositoryDir ):
             if log:
                 if not '\t' in log:
@@ -254,7 +256,7 @@ class App:
 
         if not self.args.no_numstat:
             commit = None
-            cmd = ['git', 'log', '--cc', '--reverse', '--topo-order', '--format=%h', '--numstat', Globals.branch, '--']
+            cmd = [self.gitBin] + self.gitDefaultArgs + ['log', '--cc', '--reverse', '--topo-order', '--format=%h', '--numstat', Globals.branch, '--']
             cmd.extend( Globals.includePaths )
             for log in Utils.call( cmd, cwd=Globals.repositoryDir ):
                 if log:
